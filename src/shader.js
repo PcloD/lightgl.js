@@ -32,6 +32,7 @@ var LIGHTGL_PREFIX = 'LIGHTGL';
 // ### new GL.Shader(vertexSource, fragmentSource)
 //
 // Compiles a shader program using the provided vertex and fragment shaders.
+function bindShader(gl) {
 function Shader(vertexSource, fragmentSource) {
   // Allow passing in the id of an HTML script tag with the source
   function followScriptTagById(id) {
@@ -263,3 +264,6 @@ Shader.prototype = {
     return this;
   }
 };
+
+return Shader;
+}

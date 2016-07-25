@@ -4,9 +4,9 @@
   <script>
 
 var time = 0;
-var gl = GL.create();
-var mesh = GL.Mesh.sphere({ normals: true });
-var badShader = new GL.Shader('\
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.sphere({ normals: true });
+var badShader = new gl.Shader('\
   varying vec3 normal;\
   void main() {\
     normal = (gl_ModelViewMatrix * vec4(gl_Normal, 0.0)).xyz;\
@@ -18,7 +18,7 @@ var badShader = new GL.Shader('\
     gl_FragColor = vec4(normalize(normal) * 0.5 + 0.5, 1.0);\
   }\
 ');
-var goodShader = new GL.Shader('\
+var goodShader = new gl.Shader('\
   varying vec3 normal;\
   void main() {\
     normal = gl_NormalMatrix * gl_Normal;\

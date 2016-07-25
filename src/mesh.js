@@ -65,13 +65,15 @@ Indexer.prototype = {
 //
 // Provides a simple method of uploading data to a GPU buffer. Example usage:
 //
-//     var vertices = new GL.Buffer(gl.ARRAY_BUFFER, Float32Array);
-//     var indices = new GL.Buffer(gl.ELEMENT_ARRAY_BUFFER, Uint16Array);
+//     var vertices = new gl.Buffer(gl.ARRAY_BUFFER, Float32Array);
+//     var indices = new gl.Buffer(gl.ELEMENT_ARRAY_BUFFER, Uint16Array);
 //     vertices.data = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [1, 1, 0]];
 //     indices.data = [[0, 1, 2], [2, 1, 3]];
 //     vertices.compile();
 //     indices.compile();
 //
+function bindBuffer(gl) {
+
 function Buffer(target, type) {
   this.buffer = null;
   this.target = target;
@@ -107,6 +109,9 @@ Buffer.prototype = {
   }
 };
 
+return Buffer;
+}
+
 // ### new GL.Mesh([options])
 //
 // Represents a collection of vertex buffers and index buffers. Each vertex
@@ -119,6 +124,7 @@ Buffer.prototype = {
 // `gl.TRIANGLES` and `gl.LINES`, respectively. Only `triangles` is enabled by
 // default, although `computeWireframe()` will add a normal buffer if it wasn't
 // initially enabled.
+function bindMesh(gl) {
 function Mesh(options) {
   options = options || {};
   this.vertexBuffers = {};
@@ -137,7 +143,7 @@ Mesh.prototype = {
   // Add a new vertex buffer with a list as a property called `name` on this object
   // and map it to the attribute called `attribute` in all shaders that draw this mesh.
   addVertexBuffer: function(name, attribute) {
-    var buffer = this.vertexBuffers[attribute] = new Buffer(gl.ARRAY_BUFFER, Float32Array);
+    var buffer = this.vertexBuffers[attribute] = new gl.Buffer(gl.ARRAY_BUFFER, Float32Array);
     buffer.name = name;
     this[name] = [];
   },
@@ -146,7 +152,7 @@ Mesh.prototype = {
   //
   // Add a new index buffer with a list as a property called `name` on this object.
   addIndexBuffer: function(name) {
-    var buffer = this.indexBuffers[name] = new Buffer(gl.ELEMENT_ARRAY_BUFFER, Uint16Array);
+    var buffer = this.indexBuffers[name] = new gl.Buffer(gl.ELEMENT_ARRAY_BUFFER, Uint16Array);
     this[name] = [];
   },
 
@@ -420,3 +426,6 @@ Mesh.load = function(json, options) {
   mesh.compile();
   return mesh;
 };
+
+return Mesh;
+}

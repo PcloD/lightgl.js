@@ -2,6 +2,11 @@
 
 This library makes it easier to quickly prototype WebGL applications. It's lower level than many other WebGL libraries and while it doesn't provide a scene graph, it re-implements OpenGL's modelview/projection matrix stack to provide similar functionality. It also re-introduces some built-in uniforms from GLSL (such as `gl_Vertex` and `gl_ModelViewProjectionMatrix`) and OpenGL's immediate mode.
 
+This is a fork of the original to support using lightgl.js on multiple canvases 
+in a single page. The original sources use a single global variable to hold the 
+WebGL context, making this impossible.
+
+
 ## Building the library
 
 * `python build.py`: build `lightgl.js` from the files in the `src` directory
@@ -19,9 +24,9 @@ The latest lightgl.js build can be found at http://evanw.github.com/lightgl.js/l
       <script>
 
     var angle = 0;
-    var gl = GL.create();
-    var mesh = GL.Mesh.cube();
-    var shader = new GL.Shader('\
+    var gl = GL.create(document.createElement('canvas'));
+    var mesh = gl.Mesh.cube();
+    var shader = new gl.Shader('\
       void main() {\
         gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
       }\

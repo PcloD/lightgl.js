@@ -9,16 +9,16 @@ var time = 0;
 var angleX = 20;
 var angleY = 20;
 var useBoundingSphere = true;
-var gl = GL.create();
-var mesh = GL.Mesh.load(cessna);
-var cube = GL.Mesh.cube().computeWireframe();
-var sphere = GL.Mesh.sphere({ detail: 3 }).computeWireframe();
-var plane = GL.Mesh.plane({ normals: true, coords: true }).transform(GL.Matrix.scale(300, 300, 1));
-var depthMap = new GL.Texture(1024, 1024, { format: gl.RGB });
-var texturePlane = GL.Mesh.plane({ coords: true });
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.load(cessna);
+var cube = gl.Mesh.cube().computeWireframe();
+var sphere = gl.Mesh.sphere({ detail: 3 }).computeWireframe();
+var plane = gl.Mesh.plane({ normals: true, coords: true }).transform(gl.Matrix.scale(300, 300, 1));
+var depthMap = new gl.Texture(1024, 1024, { format: gl.RGB });
+var texturePlane = gl.Mesh.plane({ coords: true });
 var boundingSphere = mesh.getBoundingSphere();
 var boundingBox = mesh.getAABB();
-var colorShader = new GL.Shader('\
+var colorShader = new gl.Shader('\
   uniform vec3 center;\
   uniform vec3 radius;\
   void main() {\
@@ -29,7 +29,7 @@ var colorShader = new GL.Shader('\
     gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);\
   }\
 ');
-var depthShader = new GL.Shader('\
+var depthShader = new gl.Shader('\
   varying vec4 pos;\
   void main() {\
     gl_Position = pos = gl_ModelViewProjectionMatrix * gl_Vertex;\
@@ -41,7 +41,7 @@ var depthShader = new GL.Shader('\
     gl_FragColor = vec4(depth * 0.5 + 0.5);\
   }\
 ');
-var displayShader = new GL.Shader('\
+var displayShader = new gl.Shader('\
   uniform mat4 shadowMapMatrix;\
   uniform vec3 light;\
   varying vec4 coord;\
@@ -77,7 +77,7 @@ var displayShader = new GL.Shader('\
     gl_FragColor = vec4((normal * 0.5 + 0.5) * mix(ambient, 1.0, diffuse * (1.0 - shadow)), 1.0);\
   }\
 ');
-var textureShader = new GL.Shader('\
+var textureShader = new gl.Shader('\
   varying vec2 coord;\
   void main() {\
     coord = gl_TexCoord.xy;\
@@ -116,7 +116,7 @@ function cameraForBoundingSphere(light, boundingSphere) {
 function cameraForBoundingBox(light, boundingBox) {
   var center = boundingBox.min.add(boundingBox.max).divide(2);
   var axisZ = center.subtract(light).unit();
-  var axisX = axisZ.cross(new GL.Vector(0, 1, 0)).unit();
+  var axisX = axisZ.cross(new gl.Vector(0, 1, 0)).unit();
   var axisY = axisX.cross(axisZ);
   var near = Number.MAX_VALUE;
   var far = -Number.MAX_VALUE;
@@ -129,7 +129,7 @@ function cameraForBoundingBox(light, boundingBox) {
   // Incidentally, this algorithm works for convex hulls of any shape and will
   // return the optimal bounding frustum for every hull.
   for (var i = 0; i < 8; i++) {
-    point = GL.Vector.lerp(boundingBox.min, boundingBox.max, new GL.Vector(!!(i & 1), !!(i & 2), !!(i & 4)));
+    point = gl.Vector.lerp(boundingBox.min, boundingBox.max, new gl.Vector(!!(i & 1), !!(i & 2), !!(i & 4)));
     var toPoint = point.subtract(light);
     var dotZ = toPoint.dot(axisZ);
     var slopeX = toPoint.dot(axisX) / dotZ;
@@ -153,7 +153,7 @@ function cameraForBoundingBox(light, boundingBox) {
 
 gl.ondraw = function() {
   // Move the light around
-  var light = new GL.Vector(100 * Math.sin(time * 0.2), 25, 20 * Math.cos(time * 0.2));
+  var light = new gl.Vector(100 * Math.sin(time * 0.2), 25, 20 * Math.cos(time * 0.2));
 
   // Construct a camera looking from the light toward the object. The view
   // frustum is fit so it tightly encloses the bounding volume of the object
@@ -177,7 +177,7 @@ gl.ondraw = function() {
 
   // Recover the corners of the view frustum
   var w = gl.canvas.width, h = gl.canvas.height;
-  var eye = gl.modelviewMatrix.inverse().transformPoint(new GL.Vector());
+  var eye = gl.modelviewMatrix.inverse().transformPoint(new gl.Vector());
   var corners = [
     gl.unProject(0, 0, 0),
     gl.unProject(w, 0, 0),
@@ -222,7 +222,7 @@ gl.ondraw = function() {
   if (useBoundingSphere) {
     colorShader.uniforms({
       center: boundingSphere.center,
-      radius: new GL.Vector(boundingSphere.radius, boundingSphere.radius, boundingSphere.radius)
+      radius: new gl.Vector(boundingSphere.radius, boundingSphere.radius, boundingSphere.radius)
     }).draw(sphere, gl.LINES);
   } else {
     colorShader.uniforms({

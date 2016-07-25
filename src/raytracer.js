@@ -38,6 +38,7 @@ HitTest.prototype = {
 //       gl.canvas.height / 2);
 //     var result = GL.Raytracer.hitTestSphere(
 //       tracer.eye, ray, new GL.Vector(0, 0, 0), 1);
+function bindRaytracer(gl) {
 function Raytracer() {
   var v = gl.getParameter(gl.VIEWPORT);
   var m = gl.modelviewMatrix.m;
@@ -146,3 +147,6 @@ Raytracer.hitTestTriangle = function(origin, ray, a, b, c) {
 
   return null;
 };
+
+return Raytracer;
+}

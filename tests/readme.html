@@ -4,9 +4,9 @@
   <script>
 
 var angle = 0;
-var gl = GL.create();
-var mesh = GL.Mesh.cube();
-var shader = new GL.Shader('\
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.cube();
+var shader = new gl.Shader('\
   void main() {\
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
   }\

@@ -5,12 +5,12 @@
   <script>
 
 var angle = 0;
-var gl = GL.create();
-var mesh = GL.Mesh.load(gazebo);
-var plane = GL.Mesh.plane({ coords: true });
-var texture = GL.Texture.fromURL('texture.png');
-var overlay = new GL.Texture(256, 256);
-var meshShader = new GL.Shader('\
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.load(gazebo);
+var plane = gl.Mesh.plane({ coords: true });
+var texture = gl.Texture.fromURL('texture.png');
+var overlay = new gl.Texture(256, 256);
+var meshShader = new gl.Shader('\
   varying vec3 normal;\
   void main() {\
     normal = gl_Normal;\
@@ -22,7 +22,7 @@ var meshShader = new GL.Shader('\
     gl_FragColor = vec4(normal * 0.5 + 0.5, 1.0);\
   }\
 ');
-var planeShader = new GL.Shader('\
+var planeShader = new gl.Shader('\
   varying vec2 coord;\
   void main() {\
     coord = gl_TexCoord.xy;\

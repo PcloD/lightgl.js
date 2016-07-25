@@ -1,5 +1,3 @@
-// The internal `gl` variable holds the current WebGL context.
-var gl;
 
 var GL = {
   // ### Initialization
@@ -7,37 +5,40 @@ var GL = {
   // `GL.create()` creates a new WebGL context and augments it with more
   // methods. The alpha channel is disabled by default because it usually causes
   // unintended transparencies in the canvas.
-  create: function(options) {
+  create: function(canvas, options) {
+    var gl;
+
     options = options || {};
-    var canvas = document.createElement('canvas');
-    canvas.width = 800;
-    canvas.height = 600;
     if (!('alpha' in options)) options.alpha = false;
     try { gl = canvas.getContext('webgl', options); } catch (e) {}
     try { gl = gl || canvas.getContext('experimental-webgl', options); } catch (e) {}
     if (!gl) throw new Error('WebGL not supported');
     gl.HALF_FLOAT_OES = 0x8D61;
-    addMatrixStack();
-    addImmediateMode();
-    addEventListeners();
-    addOtherMethods();
+
+    // Export all external classes, binding them to a gl context for this
+    // canvas.
+    gl.Matrix = Matrix;
+    gl.Indexer = Indexer;
+    gl.Buffer = bindBuffer(gl);
+    gl.Mesh = bindMesh(gl);
+    gl.Raytracer = bindRaytracer(gl);
+    gl.Shader = bindShader(gl);
+    gl.Texture = bindTexture(gl);
+    gl.Vector = Vector;
+
+    gl.keys = GL.keys;
+
+    addMatrixStack(gl);
+    addImmediateMode(gl);
+    addEventListeners(gl);
+    addOtherMethods(gl);
+
     return gl;
   },
 
   // `GL.keys` contains a mapping of key codes to booleans indicating whether
   // that key is currently pressed.
   keys: {},
-
-  // Export all external classes.
-  Matrix: Matrix,
-  Indexer: Indexer,
-  Buffer: Buffer,
-  Mesh: Mesh,
-  HitTest: HitTest,
-  Raytracer: Raytracer,
-  Shader: Shader,
-  Texture: Texture,
-  Vector: Vector
 };
 
 // ### Matrix stack
@@ -45,7 +46,7 @@ var GL = {
 // Implement the OpenGL modelview and projection matrix stacks, along with some
 // other useful GLU matrix functions.
 
-function addMatrixStack() {
+function addMatrixStack(gl) {
   gl.MODELVIEW = ENUM | 1;
   gl.PROJECTION = ENUM | 2;
   var tempMatrix = new Matrix();
@@ -144,14 +145,14 @@ function addMatrixStack() {
 // debugging. This intentionally doesn't implement fixed-function lighting
 // because it's only meant for quick debugging tasks.
 
-function addImmediateMode() {
+function addImmediateMode(gl) {
   var immediateMode = {
-    mesh: new Mesh({ coords: true, colors: true, triangles: false }),
+    mesh: new gl.Mesh({ coords: true, colors: true, triangles: false }),
     mode: -1,
     coord: [0, 0, 0, 0],
     color: [1, 1, 1, 1],
     pointSize: 1,
-    shader: new Shader('\
+    shader: new gl.Shader('\
       uniform float pointSize;\
       varying vec4 color;\
       varying vec4 coord;\
@@ -210,7 +211,7 @@ function addImmediateMode() {
 // `gl.onmousedown()`, `gl.onmousemove()`, and `gl.onmouseup()` with an
 // augmented event object. The event object also has the properties `x`, `y`,
 // `deltaX`, `deltaY`, and `dragging`.
-function addEventListeners() {
+function addEventListeners(gl) {
   var context = gl, oldX = 0, oldY = 0, buttons = {}, hasOld = false;
   var has = Object.prototype.hasOwnProperty;
   function isDragging() {
@@ -362,7 +363,7 @@ on(document, 'keyup', function(e) {
   }
 });
 
-function addOtherMethods() {
+function addOtherMethods(gl) {
   // ### Multiple contexts
   //
   // When using multiple contexts in one web page, `gl.makeCurrent()` must be

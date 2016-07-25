@@ -5,9 +5,9 @@
 
 var angleX = 30;
 var angleY = 10;
-var gl = GL.create();
-var mesh = GL.Mesh.plane();
-var shader = new GL.Shader('\
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.plane();
+var shader = new gl.Shader('\
   uniform vec3 ray00;\
   uniform vec3 ray10;\
   uniform vec3 ray01;\
@@ -96,7 +96,7 @@ gl.ondraw = function() {
   // Get corner rays
   var w = gl.canvas.width;
   var h = gl.canvas.height;
-  var tracer = new GL.Raytracer();
+  var tracer = new gl.Raytracer();
   shader.uniforms({
     eye: tracer.eye,
     ray00: tracer.getRayForPixel(0, h),

@@ -95,10 +95,10 @@ CSG.prototype.setColor = function(r, g, b) {
   });
 };
 
-// Convert from CSG solid to GL.Mesh object
+// Convert from CSG solid to gl.Mesh object
 CSG.prototype.toMesh = function() {
-  var mesh = new GL.Mesh({ normals: true, colors: true });
-  var indexer = new GL.Indexer();
+  var mesh = new gl.Mesh({ normals: true, colors: true });
+  var indexer = new gl.Indexer();
   this.toPolygons().map(function(polygon) {
     var indices = polygon.vertices.map(function(vertex) {
       vertex.color = polygon.shared;
@@ -118,6 +118,7 @@ CSG.prototype.toMesh = function() {
 var angleX = 20;
 var angleY = 20;
 var viewers = [];
+var gl;
 
 // A viewer is a WebGL canvas that lets the user view a mesh. The user can
 // tumble it around by dragging the mouse.
@@ -125,7 +126,7 @@ function Viewer(csg, width, height, depth) {
   viewers.push(this);
 
   // Get a new WebGL canvas
-  var gl = GL.create();
+  gl = GL.create(document.createElement('canvas'));
   this.gl = gl;
   this.mesh = csg.toMesh();
 
@@ -146,7 +147,7 @@ function Viewer(csg, width, height, depth) {
   gl.polygonOffset(1, 1);
 
   // Black shader for wireframe
-  this.blackShader = new GL.Shader('\
+  this.blackShader = new gl.Shader('\
     void main() {\
       gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
     }\
@@ -157,7 +158,7 @@ function Viewer(csg, width, height, depth) {
   ');
 
   // Shader with diffuse and specular lighting
-  this.lightingShader = new GL.Shader('\
+  this.lightingShader = new gl.Shader('\
     varying vec3 color;\
     varying vec3 normal;\
     varying vec3 light;\

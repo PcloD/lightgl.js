@@ -14,9 +14,9 @@
   <script>
 
 var angle = 0;
-var gl = GL.create();
-var mesh = GL.Mesh.cube();
-var shader = new GL.Shader('vertex-id', 'fragment-id');
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.cube();
+var shader = new gl.Shader('vertex-id', 'fragment-id');
 
 gl.onupdate = function(seconds) {
   angle += 45 * seconds;

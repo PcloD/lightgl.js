@@ -4,11 +4,11 @@
   <script>
 
 var angle = 0;
-var gl = GL.create();
-var mesh = GL.Mesh.plane({ coords: true });
-var texture = GL.Texture.fromURL('texture.png');
-var texture2 = GL.Texture.fromURL('texture2.png');
-var shader = new GL.Shader('\
+var gl = GL.create(document.createElement('canvas'));
+var mesh = gl.Mesh.plane({ coords: true });
+var texture = gl.Texture.fromURL('texture.png');
+var texture2 = gl.Texture.fromURL('texture2.png');
+var shader = new gl.Shader('\
   varying vec2 coord;\
   void main() {\
     coord = gl_TexCoord.xy;\

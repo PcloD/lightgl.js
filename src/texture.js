@@ -22,6 +22,7 @@
 //       format: gl.RGB, // Defaults to gl.RGBA
 //       type: gl.FLOAT // Defaults to gl.UNSIGNED_BYTE
 //     });
+function bindTexture(gl) {
 function Texture(width, height, options) {
   options = options || {};
   this.id = gl.createTexture();
@@ -223,3 +224,6 @@ Texture.canUseHalfFloatingPointTextures = function() {
 Texture.canUseHalfFloatingPointLinearFiltering = function() {
   return !!gl.getExtension('OES_texture_half_float_linear');
 };
+
+return Texture;
+}
